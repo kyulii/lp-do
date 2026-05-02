@@ -8,6 +8,37 @@ LP-DO 프로젝트의 주요 변경 사항을 기록한다.
 
 ## [Unreleased]
 
+### Changed — 2026-05-02 (보완)
+
+#### 아카이브 월 네비게이션 동적화
+
+좌우 화살표가 May 2026 고정 토스트만 띄우던 것을 실제 월 전환으로 교체. 헤더 `Volume {month} : {year}` + 턴테이블 호선 라벨 + Tracklist 타이틀이 현재 보고 있는 월/연 따라 동기화되도록 일반화.
+
+**데이터 헬퍼 일반화**
+- `src/lib/lpb.ts`
+  - `makeAlbums()` → `makeAlbums(year, month)`. `Date` API로 1일 요일 + 월 일수 + 이전 월 마지막일 계산해 6×7 그리드 동적 생성
+  - `weekdayOfMay(d)` → `weekdayOf(year, month, day)` 일반화
+  - `MONTH_NAMES` (대문자) / `MONTH_NAMES_TITLE` (타이틀케이스) 상수 추가
+  - 시드 트랙은 `year === 2026 && month === 5`일 때만 적용 — 다른 월은 빈 캘린더
+
+**상태 / 영속화 리팩터**
+- `src/components/LPBarApp.tsx`
+  - `currentMonth: { year, month }` 상태 추가
+  - 저장 구조 `Album[]` → `Record<"YYYY-MM", Album[]>`. `STORAGE_KEY`를 `lpbar:albums:v2`로 bump
+  - `shiftMonth(±1)` 핸들러로 prev/next 월 전환 + 새 월 1일 자동 선택. 연 경계(12↔1) 처리
+  - `handleToday` `useCallback`으로 안정화 (effect deps 경고 해소)
+  - 기존 `"Volume 4 not yet pressed."` / `"Volume 6 not yet pressed."` 토스트 제거 — 실제 동작으로 대체
+
+**컴포넌트 라벨 동적화**
+- `src/components/Turntable.tsx` — `year`/`month` props로 호선 텍스트(`MAY 2026` 하드코딩 제거) + 요일명 동적 계산
+- `src/components/Tracklist.tsx` — `year`/`month` props로 `Sunday, May 2` 형식 타이틀 동적화
+
+### Notes — 2026-05-02 (보완)
+
+- `localStorage` v1 → v2 마이그레이션은 생략 (프로토타입 단계). 새 시드는 `{ "2026-05": makeAlbums(2026, 5) }`
+- 키보드 ←/→는 현재 월 내 이동 유지 (월 경계 넘김은 별도 요청 없음)
+- 검증: `npm run lint` 0 errors / `npx tsc --noEmit` 클린 / `npm run build` 성공
+
 ### Added — 2026-05-02
 
 #### LP Bar 프로토타입 (Pop Art Studio) 구현

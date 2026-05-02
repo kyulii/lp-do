@@ -2,17 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Album } from "@/lib/lpb";
-import { DAYNAMES_FULL, pad2, weekdayOfMay } from "@/lib/lpb";
+import { DAYNAMES_FULL, MONTH_NAMES_TITLE, pad2, weekdayOf } from "@/lib/lpb";
 
 type Props = {
   album: Album | undefined;
+  year: number;
+  month: number;
   onToggle: (id: string) => void;
   onAdd: (text: string) => string;
   onDelete: (id: string) => void;
   onUpdate: (id: string, text: string) => void;
 };
 
-export default function Tracklist({ album, onToggle, onAdd, onDelete, onUpdate }: Props) {
+export default function Tracklist({ album, year, month, onToggle, onAdd, onDelete, onUpdate }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -33,7 +35,7 @@ export default function Tracklist({ album, onToggle, onAdd, onDelete, onUpdate }
       <div className="tl-meta">
         <div className="tl-now">NOW PLAYING</div>
         <div className="tl-title">
-          {DAYNAMES_FULL[weekdayOfMay(album?.day ?? 1)]}, May {album?.day ?? ""}
+          {DAYNAMES_FULL[weekdayOf(year, month, album?.day ?? 1)]}, {MONTH_NAMES_TITLE[month - 1]} {album?.day ?? ""}
         </div>
         <div className="tl-progress-row">
           <span className="tl-progress-text">

@@ -1,14 +1,14 @@
 "use client";
 
 import type { Album } from "@/lib/lpb";
-import { DAYNAMES, pad2, weekdayOfMay } from "@/lib/lpb";
+import { DAYNAMES, MONTH_NAMES, pad2, weekdayOf } from "@/lib/lpb";
 
-type Props = { album: Album | undefined };
+type Props = { album: Album | undefined; year: number; month: number };
 
-export default function Turntable({ album }: Props) {
+export default function Turntable({ album, year, month }: Props) {
   const day = album?.day ?? 1;
-  const monthLabel = "MAY 2026";
-  const dayName = DAYNAMES[weekdayOfMay(day)];
+  const monthLabel = `${MONTH_NAMES[month - 1]} ${year}`;
+  const dayName = DAYNAMES[weekdayOf(year, month, day)];
 
   return (
     <div className="tt-graphic">

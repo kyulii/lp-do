@@ -52,24 +52,71 @@ const completedSet: Record<number, number[]> = {
   15: [0],
 };
 
-export function makeAlbums(): Album[] {
-  // 6x7 grid for May 2026, Sunday-first.
-  // May 1 2026 = Friday → leading SUN..THU from previous month: Apr 26..Apr 30 (5 cells)
+function daysInMonth(year: number, month: number): number {
+  return new Date(year, month, 0).getDate();
+}
+
+function firstWeekdayOfMonth(year: number, month: number): number {
+  return new Date(year, month - 1, 1).getDay();
+}
+
+function prevMonthOf(year: number, month: number): { year: number; month: number } {
+  if (month === 1) return { year: year - 1, month: 12 };
+  return { year, month: month - 1 };
+}
+
+function nextMonthOf(year: number, month: number): { year: number; month: number } {
+  if (month === 12) return { year: year + 1, month: 1 };
+  return { year, month: month + 1 };
+}
+
+export function makeAlbums(year: number, month: number): Album[] {
+  // 6x7 grid, Sunday-first.
   const days: Album[] = [];
-  for (let d = 26; d <= 30; d++) {
-    days.push({ key: `2026-04-${d}`, day: d, month: 4, padding: true, tracks: [] });
+  const isMaySeed = year === 2026 && month === 5;
+
+  const leadCount = firstWeekdayOfMonth(year, month);
+  const prev = prevMonthOf(year, month);
+  const prevLast = daysInMonth(prev.year, prev.month);
+  for (let i = leadCount - 1; i >= 0; i--) {
+    const d = prevLast - i;
+    days.push({
+      key: `${prev.year}-${pad2(prev.month)}-${d}`,
+      day: d,
+      month: prev.month,
+      padding: true,
+      tracks: [],
+    });
   }
-  for (let d = 1; d <= 31; d++) {
-    const tracks: Track[] = (seedTracks[d] || []).map((text, i) => ({
-      id: `t-${d}-${i}`,
-      text,
-      done: (completedSet[d] || []).includes(i),
-    }));
-    days.push({ key: `2026-05-${d}`, day: d, month: 5, padding: false, tracks });
+
+  const last = daysInMonth(year, month);
+  for (let d = 1; d <= last; d++) {
+    const tracks: Track[] = isMaySeed
+      ? (seedTracks[d] || []).map((text, i) => ({
+          id: `t-${d}-${i}`,
+          text,
+          done: (completedSet[d] || []).includes(i),
+        }))
+      : [];
+    days.push({
+      key: `${year}-${pad2(month)}-${d}`,
+      day: d,
+      month,
+      padding: false,
+      tracks,
+    });
   }
+
+  const next = nextMonthOf(year, month);
   let nextD = 1;
   while (days.length < 42) {
-    days.push({ key: `2026-06-${nextD}`, day: nextD, month: 6, padding: true, tracks: [] });
+    days.push({
+      key: `${next.year}-${pad2(next.month)}-${nextD}`,
+      day: nextD,
+      month: next.month,
+      padding: true,
+      tracks: [],
+    });
     nextD++;
   }
   return days;
@@ -95,9 +142,38 @@ export const DAYNAMES_FULL = [
   "Saturday",
 ] as const;
 
-// weekday for May D, 2026 (May 1 = Friday → 5)
-export function weekdayOfMay(d: number): number {
-  return (5 + (d - 1)) % 7;
+export const MONTH_NAMES = [
+  "JANUARY",
+  "FEBRUARY",
+  "MARCH",
+  "APRIL",
+  "MAY",
+  "JUNE",
+  "JULY",
+  "AUGUST",
+  "SEPTEMBER",
+  "OCTOBER",
+  "NOVEMBER",
+  "DECEMBER",
+] as const;
+
+export const MONTH_NAMES_TITLE = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
+export function weekdayOf(year: number, month: number, day: number): number {
+  return new Date(year, month - 1, day).getDay();
 }
 
 export function pad2(n: number): string {
