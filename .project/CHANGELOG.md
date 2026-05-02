@@ -8,6 +8,33 @@ LP-DO 프로젝트의 주요 변경 사항을 기록한다.
 
 ## [Unreleased]
 
+### Added — 2026-05-03
+
+#### Supabase 세팅 + DB 스키마 구축
+
+BaaS로 사용할 Supabase 프로젝트를 코드베이스에 연결하고 DB 스키마/RLS 정책을 생성. 실제 데이터 흐름 적용(localStorage → DB)은 후속 작업.
+
+**패키지**
+- `@supabase/supabase-js@2.105.1` — 코어 SDK
+- `@supabase/ssr@0.10.2` — Next.js App Router용 cookie 기반 세션 관리
+
+**환경변수**
+- `.env.example` — placeholder 템플릿 (커밋용)
+- `.env.local` — gitignore됨, 실제 Supabase URL / publishable key 채움
+- `.gitignore` — `.env*` 차단 + `!.env.example` 예외 추가
+
+**클라이언트 / 미들웨어**
+- `src/lib/supabase/client.ts` — `createBrowserClient` 헬퍼 (브라우저용)
+- `src/lib/supabase/server.ts` — `createServerClient` 헬퍼 (서버 컴포넌트 / Route Handler / Server Action용, Next.js 16의 async `cookies()` 대응)
+- `src/middleware.ts` — 모든 요청에서 `auth.getUser()` 호출해 세션 토큰 자동 갱신. 정적 자산은 matcher로 제외
+
+**Supabase DB 스키마 (Supabase 대시보드 SQL Editor에서 실행)**
+- `public.users` — `auth.users(id)` 참조 프로필 테이블. `auth.users` 생성 시 `handle_new_user()` 트리거로 자동 생성
+- `public.tracks` — 할 일 목록 (id, user_id, title, is_completed, date, created_at)
+- `public.albums` — 하루 단위 메타 (id, user_id, date, cover_style, total_tracks, completed_tracks). `(user_id, date)` unique
+- 인덱스: `tracks_user_date_idx`, `albums_user_date_idx`
+- 모든 테이블 RLS ON + `auth.uid() = user_id` 기반 SELECT/INSERT/UPDATE/DELETE 정책
+
 ### Fixed — 2026-05-02 (보완 5)
 
 #### 턴테이블 박스 비례 축소 (잘림 해소 + 트랙리스트 영역 보존)
