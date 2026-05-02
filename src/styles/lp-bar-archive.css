@@ -128,17 +128,26 @@
 }
 .ar-menu-item:hover { color: var(--lpb-accent); }
 
-/* Calendar — must fit 6 rows in viewport, no scroll */
+/* Calendar — must fit 6 rows in viewport, no scroll. Cells are always square. */
 .ar-calendar {
+  container-type: size;
   display: grid;
   grid-template-rows: auto 1fr;
   min-height: 0;
   gap: 8px;
+  /* Square cell size: smaller of width-based vs height-based.
+     Width: (W - 6*8 col gaps) / 7
+     Height: (H - 24 weekday allowance - 8 cal gap - 5*8 row gaps) / 6 */
+  --cell: min(
+    calc((100cqw - 48px) / 7),
+    calc((100cqh - 72px) / 6)
+  );
 }
 .ar-weekdays {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, var(--cell));
   gap: 8px;
+  justify-self: center;
 }
 .ar-wd {
   font-family: var(--lpb-mono);
@@ -151,11 +160,13 @@
 
 .ar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: repeat(7, var(--cell));
+  grid-template-rows: repeat(6, var(--cell));
   gap: 8px;
   min-height: 0;
   min-width: 0;
+  justify-self: center;
+  align-self: start;
 }
 
 /* Album card — must size to grid cell, never overflow */

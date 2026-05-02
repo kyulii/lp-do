@@ -8,6 +8,21 @@ LP-DO 프로젝트의 주요 변경 사항을 기록한다.
 
 ## [Unreleased]
 
+### Fixed — 2026-05-02 (보완 4)
+
+#### 아카이브 앨범 셀 정사각형 유지
+
+화면 크기에 따라 앨범 셀이 직사각형으로 변형되던 문제 수정. 6행이 항상 viewport에 들어가는 제약은 유지하면서, 셀이 어떤 화면 비율에서도 정사각형을 유지하도록 함.
+
+- `src/styles/lp-bar-archive.css`
+  - `.ar-calendar`에 `container-type: size` 추가, `--cell` 변수 정의 — `min((100cqw - 48px) / 7, (100cqh - 72px) / 6)` 으로 가로/세로 기준 중 작은 값 채택
+    - `48px` = 컬럼 사이 6개 간격(8px × 6)
+    - `72px` = 요일행 여유 24px + 캘린더 갭 8px + 그리드 행간 5 × 8px
+  - `.ar-weekdays`와 `.ar-grid` 모두 `grid-template-columns: repeat(7, 1fr)` → `repeat(7, var(--cell))`로 변경. 컬럼 폭 일치 보장
+  - `.ar-grid`의 `grid-template-rows: repeat(6, 1fr)` → `repeat(6, var(--cell))`로 셀 높이 = 셀 폭
+  - `justify-self: center`로 캘린더 영역보다 좁아진 경우 가운데 정렬, `.ar-grid`엔 `align-self: start` 추가로 그리드 위치 고정
+- 셀 사이 간격(8px)은 변경 없음
+
 ### Fixed — 2026-05-02 (보완 3)
 
 #### 턴테이블 박스가 트랙리스트를 가리는 레이아웃 버그 수정
