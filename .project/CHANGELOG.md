@@ -8,6 +8,17 @@ LP-DO 프로젝트의 주요 변경 사항을 기록한다.
 
 ## [Unreleased]
 
+### Fixed — 2026-05-02 (보완 2)
+
+#### Add Track 토스트 타이밍 + 카피 정정
+
+`+ Add Track` 클릭만으로 "Cut to vinyl." 토스트가 떠 저장이 끝났다고 오해되는 문제 수정. 토스트 카피도 표준 영어 관용구로 정정해 한국인 가독성 개선.
+
+- `src/components/LPBarApp.tsx`
+  - `addTrack`의 `onToast?.("Cut to vinyl.")` 호출 제거 — 빈 트랙은 편집 모드 진입용 placeholder이므로 저장 토스트 부적절
+  - `updateTrack` 토스트 멘트 `Cut to vinyl.` → `Cut A Record.` (영어 관용구 표준화)
+- 시드 트랙(`src/lib/lpb.ts`의 May 2 To-Do 항목 "Cut to vinyl")은 사용자 작성 컨텍스트라 유지
+
 ### Changed — 2026-05-02 (보완)
 
 #### 아카이브 월 네비게이션 동적화

@@ -106,7 +106,6 @@ export default function LPBarApp({
     const id = `t-${selectedKey}-${Date.now()}`;
     const newTrack: Track = { id, text, done: false };
     updateAlbum((a) => ({ ...a, tracks: [...a.tracks, newTrack] }));
-    onToast?.("Cut to vinyl.");
     return id;
   }
 
@@ -119,7 +118,7 @@ export default function LPBarApp({
       ...a,
       tracks: a.tracks.map((t) => (t.id === id ? { ...t, text } : t)),
     }));
-    onToast?.("Cut to vinyl.");
+    onToast?.("Cut A Record.");
   }
 
   function shiftMonth(delta: number) {
