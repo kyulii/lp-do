@@ -8,6 +8,17 @@ LP-DO 프로젝트의 주요 변경 사항을 기록한다.
 
 ## [Unreleased]
 
+### Fixed — 2026-05-02 (보완 5)
+
+#### 턴테이블 박스 비례 축소 (잘림 해소 + 트랙리스트 영역 보존)
+
+보완 3에서 `.tt-graphic`에 `overflow: hidden`을 추가하면서, 작은 viewport(맥북 사이즈, 700–800px)에서 박스 자연 높이(314px)가 셀(32vh ≈ 224–256px)보다 커서 박스 하단이 잘리는 부작용 발생. 셀 자체에 박스 비율을 부여해 viewport 따라 박스가 비례 축소되도록 변경 — 잘림 해소 + 트랙리스트(`.tl`) 영역은 `1fr`로 처음처럼 유지.
+
+- `src/styles/lp-bar-turntable.css`
+  - `.tt-graphic`에 `aspect-ratio: 1.05 / 1` + `place-self: center` 추가. `height: 32vh; max-height: 320px; min-height: 180px`는 그대로. `place-self: center`로 grid item stretch 해제 → width가 `height × 1.05`로 자동 derive. 셀이 viewport 비율 따라 박스 비율 유지하면서 비례 축소
+  - `.tt-base`는 `width: 100%; height: 100%`로 단순화 (기존 `width: min(330px, 100%)` + `aspect-ratio` + `max-height: 100%` 제거). 셀이 이미 박스 비율을 가지므로 박스는 셀 100% 차지하면 자동으로 비율 유지
+- 트랙리스트(`.tl`)는 `.tt`의 `1fr` 행 그대로 → 작은 화면에서도 충분한 영역 확보
+
 ### Fixed — 2026-05-02 (보완 4)
 
 #### 아카이브 앨범 셀 정사각형 유지
