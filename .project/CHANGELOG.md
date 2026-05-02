@@ -8,6 +8,51 @@ LP-DO 프로젝트의 주요 변경 사항을 기록한다.
 
 ## [Unreleased]
 
+### Added — 2026-05-03 (보완 2)
+
+#### Google OAuth 코드 적용
+
+가짜 SignIn(`setTimeout` 후 하드코딩 유저)을 진짜 Supabase Auth → Google OAuth로 교체. 외부 셋업(보완 1)에서 등록한 Google Provider와 연결. 이후 RLS가 실제 `auth.uid()`를 인식하므로 DB 적용 단계로 진행 가능.
+
+- `src/app/auth/callback/route.ts` (신규) — Google → Supabase → 이 라우트로 redirect되며 `?code=` 받음. `exchangeCodeForSession`으로 세션 교환 후 홈으로 redirect. 실패 시 `?auth_error=1` 붙여 홈으로
+- `src/components/SignIn.tsx`
+  - 가짜 `setTimeout` / `onSignIn` prop 제거
+  - 클릭 핸들러를 `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: '/auth/callback' } })`로 교체
+  - `SignedInUser` 타입 export는 유지 (다른 컴포넌트에서 import)
+- `src/components/LPBarPrototype.tsx`
+  - localStorage `lpbar:auth` 제거 — 세션은 supabase가 cookie로 관리
+  - 초기 로드 시 `supabase.auth.getUser()` 호출
+  - `onAuthStateChange` 구독으로 로그인/로그아웃 변화 자동 반영
+  - Sign Out → `supabase.auth.signOut()` 호출 (이후 `onAuthStateChange`가 user를 null로 set)
+  - 세션 확인 동안 깜빡임 방지용 `loading` 상태 추가
+- `user_metadata.full_name` 또는 `name`에서 이름 추출하는 `toSignedInUser` 헬퍼
+
+### Added — 2026-05-03 (보완)
+
+#### Google OAuth + Supabase Auth 외부 설정 완료
+
+코드 변경 전 외부 서비스(Google Cloud Console, Supabase Dashboard) 셋업 완료. 코드 적용은 후속 단계.
+
+**Google Cloud Console**
+- 새 프로젝트 `lp-do` 생성
+- OAuth 동의 화면 (새 UI / 한글 — 옛날 단일 모달 대신 브랜딩/대상/데이터 액세스/클라이언트 메뉴로 분리됨)
+  - 브랜딩: 앱 이름 `LP Bar`, 사용자 지원 이메일 + 개발자 연락처 등록
+  - 대상: 사용자 유형 `외부(External)` + 테스트 사용자에 본인 Google 이메일 등록
+  - 데이터 액세스: default (openid/email/profile 자동)
+- OAuth 2.0 클라이언트 ID 생성
+  - 유형: 웹 애플리케이션, 이름: `LP Bar Web`
+  - 승인된 자바스크립트 원본: `http://localhost:3000`
+  - 승인된 리디렉션 URI: `https://hrreygrmpvlaymvyknin.supabase.co/auth/v1/callback` (Supabase 콜백 URL — Supabase가 OAuth 중계자 역할)
+- Client ID / Client Secret 발급 → Supabase에 등록
+
+**Supabase Dashboard**
+- Authentication → Providers → Google
+  - Enable Sign in with Google: ON
+  - Client ID / Client Secret: 위 Google에서 발급한 값 입력
+- Authentication → URL Configuration
+  - Site URL: `http://localhost:3000` (default 유지)
+  - Redirect URLs (allow list): `http://localhost:3000/auth/callback` 추가
+
 ### Added — 2026-05-03
 
 #### Supabase 세팅 + DB 스키마 구축

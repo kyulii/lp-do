@@ -1,22 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export type SignedInUser = { name: string; email: string };
 
-type Props = {
-  onSignIn: (user: SignedInUser) => void;
-};
-
-export default function SignIn({ onSignIn }: Props) {
+export default function SignIn() {
   const [pressing, setPressing] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     setPressing(true);
-    setTimeout(
-      () => onSignIn({ name: "Jaehee K.", email: "jaehee@example.com" }),
-      600
-    );
+    const supabase = createClient();
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
   };
 
   return (
