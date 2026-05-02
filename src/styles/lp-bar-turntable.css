@@ -3,7 +3,7 @@
   background: var(--lpb-tt-bg);
   color: var(--lpb-tt-text);
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto 1fr;
   padding: 28px 26px 24px;
   min-width: 0;
   min-height: 0;
@@ -15,13 +15,15 @@
 .tt-graphic {
   height: 32vh;
   max-height: 320px;
-  min-height: 220px;
+  min-height: 180px;
   display: grid; place-items: center;
   position: relative;
+  overflow: hidden;
 }
 .tt-base {
   width: min(330px, 100%);
   aspect-ratio: 1.05 / 1;
+  max-height: 100%;
   background: var(--lpb-tt-base);
   border-radius: 6px;
   position: relative;

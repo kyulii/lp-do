@@ -8,6 +8,17 @@ LP-DO 프로젝트의 주요 변경 사항을 기록한다.
 
 ## [Unreleased]
 
+### Fixed — 2026-05-02 (보완 3)
+
+#### 턴테이블 박스가 트랙리스트를 가리는 레이아웃 버그 수정
+
+화면 세로 높이가 줄어들면 우측 패널의 빨간 레코드 박스(`.tt-base`)가 그 아래 트랙리스트 영역 위로 흘러나와 헤더 텍스트("SATURDAY, JUNE …")를 덮어버리는 문제 수정. 원인 3가지(빈 그리드 행 / 셀 overflow visible / positioned-vs-static painting order)가 맞물려 발생.
+
+- `src/styles/lp-bar-turntable.css`
+  - `.tt` `grid-template-rows: auto auto 1fr` → `auto 1fr` — 자식 수(2개)에 맞게 행 정의 정정. `.tl`이 두 번째 `1fr` 행을 차지해 남는 공간 확보
+  - `.tt-graphic` `min-height: 220px` → `180px`, `overflow: hidden` 추가 — 박스가 셀 밖으로 못 나가도록. painting order 우회 효과까지 동시 해결
+  - `.tt-base` `max-height: 100%` 추가 — `aspect-ratio`가 자동으로 너비도 줄여 박스가 컨테이너에 비례 축소되도록
+
 ### Fixed — 2026-05-02 (보완 2)
 
 #### Add Track 토스트 타이밍 + 카피 정정
