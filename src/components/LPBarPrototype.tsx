@@ -7,6 +7,7 @@ import Toast from "./Toast";
 import { createClient } from "@/lib/supabase/client";
 
 type SupabaseUserLike = {
+  id: string;
   email?: string | null;
   user_metadata: Record<string, unknown>;
 };
@@ -14,7 +15,7 @@ type SupabaseUserLike = {
 function toSignedInUser(u: SupabaseUserLike): SignedInUser {
   const meta = u.user_metadata;
   const fullName = (meta.full_name as string) || (meta.name as string) || "";
-  return { name: fullName, email: u.email ?? "" };
+  return { id: u.id, name: fullName, email: u.email ?? "" };
 }
 
 export default function LPBarPrototype() {

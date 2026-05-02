@@ -8,6 +8,36 @@ LP-DO 프로젝트의 주요 변경 사항을 기록한다.
 
 ## [Unreleased]
 
+### Added — 2026-05-03 (보완 3)
+
+#### 트랙 CRUD를 Supabase로 적용 + 시드 데이터 제거
+
+LPBarApp의 모든 트랙 데이터 흐름을 `localStorage`에서 Supabase `public.tracks` 테이블로 이전. 보완 2의 OAuth로 확보한 `auth.uid()` 기반 RLS 정책이 실제로 동작. 하드코딩 시드 데이터 제거하고 모든 사용자/모든 월이 빈 캘린더로 시작.
+
+**CRUD 동작 (`auth.uid() = user_id` 기반 RLS 정책 적용)**
+- **R**: 월 진입/변경 시 `select` (date 범위 + user_id 필터)
+- **C**: `+ Add Track` → 클라이언트 `crypto.randomUUID()`로 ID 생성 → optimistic 추가 → 비동기 `insert`
+- **U** (텍스트): 더블클릭 → blur → optimistic 변경 → 비동기 `update({ title })` → 성공 시 "Cut A Record." 토스트
+- **U** (토글): 체크박스 → optimistic 토글 → 비동기 `update({ is_completed })`
+- **D**: × 버튼 / 빈 텍스트 blur → optimistic 제거 → 비동기 `delete`
+- 모든 CRUD: 실패 시 로컬 state rollback + `Save failed: …` 토스트
+
+**변경 파일**
+- `src/lib/lpb.ts` — `seedTracks` / `completedSet` 상수 + `makeAlbums`의 `isMaySeed` 분기 제거. 모든 월이 빈 트랙 캘린더로 init
+- `src/components/SignIn.tsx` — `SignedInUser` 타입에 `id` 필드 추가 (INSERT 시 user_id로 사용)
+- `src/components/LPBarPrototype.tsx` — `toSignedInUser`에 `id` 포함
+- `src/lib/supabase/tracks.ts` (신규) — `fetchMonthTracks` / `insertTrack` / `updateTrackTitle` / `setTrackCompleted` / `deleteTrack` CRUD 함수 모음. DB의 `title` ↔ UI의 `text`, `is_completed` ↔ `done` 변환은 LPBarApp 내부에서 매핑
+- `src/components/LPBarApp.tsx`
+  - `STORAGE_KEY` / `loadInitialMonthData` / monthData useEffect 저장 로직 모두 제거
+  - 월 진입 시 `fetchMonthTracks` 호출해 `monthData`에 채움 (cancelled flag로 race 방지)
+  - 모든 CRUD 핸들러를 supabase 호출로 교체 + optimistic UI + 실패 시 rollback
+  - `dateStringOf(year, month, day)` 헬퍼 추가 — INSERT용 `YYYY-MM-DD` 형식 (day도 pad2)
+  - user prop을 `SignedInUser | null` → `SignedInUser`로 narrowing (LPBarPrototype에서 user 보장 후 렌더)
+
+**범위 외 (다음 단계)**
+- `albums` 테이블은 미사용 — `cover_style` UI / 월 통계 페이지 / 카운트 캐시 트리거 등 도입 시점에 사용
+- 기존 `localStorage`(`lpbar:albums:v2`) 데이터는 마이그레이션 없이 무시 (프로토타입)
+
 ### Added — 2026-05-03 (보완 2)
 
 #### Google OAuth 코드 적용

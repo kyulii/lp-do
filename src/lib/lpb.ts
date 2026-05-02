@@ -8,50 +8,6 @@ export type Album = {
   tracks: Track[];
 };
 
-const seedTracks: Record<number, string[]> = {
-  1: ["Mix down vocals", "Email mastering eng.", "Update artwork brief"],
-  2: [
-    "Side B rehearsal",
-    "Coffee w/ Jin",
-    "Listen to demos",
-    "Order new stylus",
-    "Stretch 20m",
-    "Read 30 pages",
-    "Cut to vinyl",
-  ],
-  3: [],
-  4: ["Standup notes", "Refactor router"],
-  5: ["Yoga 7am", "Reply to Mira", "Q2 OKR draft"],
-  6: ["Buy birthday gift", "Pick up dry-cleaning", "Run 5k"],
-  7: ["Studio session", "Edit single cover"],
-  8: [],
-  9: ["Sunday roast", "Call mom", "Tidy desk"],
-  10: ["Write newsletter", "Schedule shoot", "Pay invoice #1142"],
-  11: ["Q3 roadmap", "1:1 w/ Sora", "Gym"],
-  12: ["Print test pressing", "Email distributor"],
-  13: ["Therapy 4pm", "Groceries"],
-  14: ["Demo to label", "Walk Bowie"],
-  15: ["Movie w/ Sam"],
-  16: [],
-  17: [],
-};
-
-const completedSet: Record<number, number[]> = {
-  1: [0, 2],
-  2: [0, 1, 2],
-  4: [0, 1],
-  5: [0],
-  6: [0, 1, 2],
-  7: [1],
-  9: [0, 1, 2],
-  10: [2],
-  11: [0],
-  12: [0, 1],
-  13: [1],
-  14: [0],
-  15: [0],
-};
-
 function daysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
@@ -71,9 +27,8 @@ function nextMonthOf(year: number, month: number): { year: number; month: number
 }
 
 export function makeAlbums(year: number, month: number): Album[] {
-  // 6x7 grid, Sunday-first.
+  // 6x7 grid, Sunday-first. tracks는 빈 array — DB에서 fetch 후 채워짐.
   const days: Album[] = [];
-  const isMaySeed = year === 2026 && month === 5;
 
   const leadCount = firstWeekdayOfMonth(year, month);
   const prev = prevMonthOf(year, month);
@@ -91,19 +46,12 @@ export function makeAlbums(year: number, month: number): Album[] {
 
   const last = daysInMonth(year, month);
   for (let d = 1; d <= last; d++) {
-    const tracks: Track[] = isMaySeed
-      ? (seedTracks[d] || []).map((text, i) => ({
-          id: `t-${d}-${i}`,
-          text,
-          done: (completedSet[d] || []).includes(i),
-        }))
-      : [];
     days.push({
       key: `${year}-${pad2(month)}-${d}`,
       day: d,
       month,
       padding: false,
-      tracks,
+      tracks: [],
     });
   }
 

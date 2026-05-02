@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export type SignedInUser = { name: string; email: string };
+export type SignedInUser = { id: string; name: string; email: string };
 
 export default function SignIn() {
   const [pressing, setPressing] = useState(false);
