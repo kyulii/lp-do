@@ -1,0 +1,288 @@
+/* LP Bar — Pop Art Studio (primary). Other themes still skinned via CSS vars. */
+
+/* ============== STRUCTURE ============== */
+
+.lpb {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr clamp(360px, 26%, 460px);
+  overflow: hidden;
+  font-family: var(--lpb-body);
+  color: var(--lpb-text);
+  background: var(--lpb-archive-bg);
+}
+
+/* ─── Archive (left) ────────────────────────────────── */
+.ar {
+  background: var(--lpb-archive-bg);
+  padding: 28px 40px 32px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  gap: 18px;
+}
+.ar-header {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+  flex-wrap: nowrap;
+}
+.ar-brand {
+  font-family: var(--lpb-display);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: var(--lpb-brand-tracking, 0.02em);
+  color: var(--lpb-text);
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.ar-volume-block {
+  display: flex;
+  align-items: baseline;
+  margin-left: 12px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.ar-volume-text {
+  font-family: "Fraunces", "Cormorant Garamond", serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--lpb-text);
+  letter-spacing: 0.005em;
+  line-height: 1;
+  opacity: 0.85;
+}
+.ar-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.ar-nav { display: flex; align-items: center; gap: 4px; }
+.ar-nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--lpb-text-muted);
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 200ms, color 200ms;
+}
+.ar-nav-btn:hover { background: var(--lpb-hover-tint); color: var(--lpb-text); }
+.ar-nav-btn .material-symbols-outlined { font-size: 18px; }
+.ar-today {
+  font-family: var(--lpb-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  background: transparent;
+  border: 1px solid var(--lpb-text);
+  color: var(--lpb-text);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 200ms, color 200ms;
+}
+.ar-today:hover { background: var(--lpb-text); color: var(--lpb-archive-bg); }
+
+.ar-account { position: relative; }
+.ar-cartridge {
+  background: transparent; border: none; cursor: pointer;
+  color: var(--lpb-text-muted);
+  width: 32px; height: 32px;
+  display: grid; place-items: center;
+  border-radius: 6px;
+  transition: color 200ms, background 200ms;
+}
+.ar-cartridge:hover { color: var(--lpb-accent); background: var(--lpb-hover-tint); }
+
+.ar-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--lpb-sleeve-base);
+  border: 1px solid var(--lpb-text);
+  min-width: 220px;
+  z-index: 30;
+  padding: 14px;
+  box-shadow: 6px 6px 0 var(--lpb-text);
+}
+.ar-menu-user { display: flex; align-items: center; gap: 10px; }
+.ar-menu-avatar {
+  width: 36px; height: 36px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--lpb-accent), var(--lpb-text));
+  flex-shrink: 0;
+}
+.ar-menu-name { font-size: 13px; font-weight: 600; color: var(--lpb-text); }
+.ar-menu-email { font-size: 11px; color: var(--lpb-text-muted); font-family: var(--lpb-mono); }
+.ar-menu-sep { height: 1px; background: var(--lpb-sleeve-border); margin: 12px 0; }
+.ar-menu-item {
+  width: 100%; text-align: left; background: transparent; border: none;
+  font-family: var(--lpb-mono); font-size: 11px; letter-spacing: 0.16em;
+  color: var(--lpb-text); text-transform: uppercase; padding: 6px 0; cursor: pointer;
+}
+.ar-menu-item:hover { color: var(--lpb-accent); }
+
+/* Calendar — must fit 6 rows in viewport, no scroll */
+.ar-calendar {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+  gap: 8px;
+}
+.ar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.ar-wd {
+  font-family: var(--lpb-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--lpb-text-muted);
+  text-align: center;
+  padding: 2px 0;
+}
+
+.ar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 8px;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Album card — must size to grid cell, never overflow */
+.album {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--lpb-sleeve-base);
+  border: 1px solid var(--lpb-sleeve-border);
+  border-radius: var(--lpb-sleeve-radius, 0px);
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  font-family: inherit;
+  transition: border-color 200ms, transform 250ms, box-shadow 250ms;
+  text-align: left;
+  min-width: 0;
+  container-type: inline-size;
+}
+.album.is-padding { opacity: 0.42; }
+.album.is-selected {
+  border: 2px solid var(--lpb-sleeve-active);
+  box-shadow: 4px 4px 0 var(--lpb-sleeve-active);
+}
+.album:hover {
+  z-index: 5;
+  box-shadow: 4px 4px 0 var(--lpb-text);
+}
+.album.is-selected:hover { box-shadow: 4px 4px 0 var(--lpb-sleeve-active); }
+
+.album-sleeve { position: absolute; inset: 0; }
+
+.album-cover {
+  position: absolute; inset: 0;
+  background: var(--lpb-sleeve-base);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.album-front {
+  position: absolute; inset: 0;
+  padding: 8% 10% 10%;
+  display: flex; flex-direction: column;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.album-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: auto;
+}
+.album-date {
+  font-family: var(--lpb-display);
+  font-weight: 500;
+  font-size: clamp(14px, 2.0cqi, 22px);
+  color: var(--lpb-text);
+  line-height: 1;
+  letter-spacing: var(--lpb-date-tracking, 0);
+}
+.album-summary {
+  display: flex; flex-direction: column;
+  gap: 2px;
+  font-size: clamp(8px, 0.85cqi, 10px);
+  line-height: 1.35;
+  font-family: var(--lpb-body);
+}
+.album-summary-line {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  color: var(--lpb-text);
+  font-weight: 500;
+}
+.album-summary-line.is-done {
+  color: var(--lpb-text-muted);
+  font-weight: 400;
+}
+.album-summary-more {
+  color: var(--lpb-text-muted);
+  font-family: var(--lpb-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+/* LP slides out from inside the sleeve on hover */
+.album-lp {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 80%; aspect-ratio: 1;
+  transform: translate(-100%, -50%);
+  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+}
+.album-lp.is-out {
+  transform: translate(45%, -50%);
+}
+.album-lp-disc {
+  width: 100%; height: 100%;
+  border-radius: 999px;
+  background: radial-gradient(circle at center,
+    var(--lpb-lp-label) 0 18%,
+    var(--lpb-lp-vinyl) 18.5% 100%);
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.30);
+}
+.album-lp.is-out .album-lp-disc {
+  animation: lpb-spin 2.5s linear infinite;
+}
+.album-lp-grooves {
+  position: absolute; inset: 4%;
+  border-radius: 999px;
+  background:
+    repeating-radial-gradient(circle at center,
+      var(--lpb-lp-vinyl) 0 1.4px,
+      var(--lpb-lp-groove) 1.4px 2.8px);
+  mask: radial-gradient(circle at center, transparent 0 22%, #000 22.5% 100%);
+  -webkit-mask: radial-gradient(circle at center, transparent 0 22%, #000 22.5% 100%);
+}
+.album-lp-label {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 36%; aspect-ratio: 1; border-radius: 999px;
+  background: var(--lpb-lp-label);
+}
+.album-lp-spindle {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 8%; aspect-ratio: 1; border-radius: 999px;
+  background: var(--lpb-lp-spindle);
+}
+
+@keyframes lpb-spin { to { transform: rotate(360deg); } }
