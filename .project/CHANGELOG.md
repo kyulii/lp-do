@@ -8,6 +8,30 @@ LP-DO 프로젝트의 주요 변경 사항을 기록한다.
 
 ## [Unreleased]
 
+### Added — 2026-05-03 (보완 4)
+
+#### Vercel 배포 외부 설정
+
+코드 변경 없이 외부 서비스(Vercel, Google Cloud, Supabase) 설정으로 prod URL 확보. Test user에 등록된 Google 계정으로 prod URL에서 동작 확인 가능.
+
+**Git**
+- 작업 브랜치들(`zeke_m_feat-*`)을 main에 머지 후 `origin/main`에 push (Vercel은 main을 prod 빌드 트리거로 사용)
+
+**Vercel**
+- vercel.com에 GitHub 계정 연동 가입
+- `kyulii/lp-do` 레포 import (Framework Preset: Next.js 자동 감지, Root Directory `./`, Build/Output 기본값)
+- Environment Variables 등록 — `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Production / Preview / Development 모두 적용)
+- Deploy → prod URL 발급
+
+**Google Cloud Console**
+- APIs & Services → Credentials → OAuth 2.0 클라이언트 `LP Bar Web`
+- **승인된 자바스크립트 원본**에 Vercel prod URL 추가 (https, 끝 슬래시 없음)
+- 승인된 리디렉션 URI는 Supabase 콜백 URL 그대로 유지 (변경 X)
+
+**Supabase Dashboard**
+- Authentication → URL Configuration → **Redirect URLs (allow list)** 에 `https://[prod-url]/auth/callback` 추가
+- Site URL은 그대로 (코드의 `redirectTo`로 명시 지정하므로 동작)
+
 ### Added — 2026-05-03 (보완 3)
 
 #### 트랙 CRUD를 Supabase로 적용 + 시드 데이터 제거
